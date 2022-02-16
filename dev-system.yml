@@ -1,0 +1,44 @@
+---
+- hosts: all
+  tasks:
+    
+    - name: Add the flathub flatpak repository remote to the user installation
+      flatpak_remote:
+        name: flathub
+        state: present
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        method: user
+
+    - name: Install the Slack flatpak
+      flatpak:
+        name: com.slack.Slack 
+        state: present
+        remote: flathub
+        method: user
+
+    - name: Install the VSCode flatpak
+      flatpak:
+        name: com.visualstudio.code
+        remote: flathub
+        method: user
+        state: present
+
+    - name: Install packages
+      become: yes
+      ansible.builtin.package:
+        name:
+          - podman
+          - tilix
+          - gnome-tweaks
+          - google-chrome-stable
+          - python3-pip
+
+    - name: Install python packages
+      pip: 
+        name:
+          - psutil
+
+    - name: CAPS LOCK -> CTRL
+      dconf:
+        key: "/org/gnome/desktop/input-sources/xkb-options"
+        value: "['caps:ctrl_modifier']"
